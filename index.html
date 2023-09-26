@@ -64,7 +64,7 @@
 		<!--tab index allows focusing on non input objects -->
 		<ul tabindex="0" onclick="closeMenu(event)" id="context-menu" onfocusout="closeMenu(event)">
 		  <li class="item">Add New</li>
-		  <li class="item" onclick="event.stopPropagation()">Color <input type="text" name="colorInput" onclick="event.stopPropagation()" onchange="clickedElement.style.color = event.target.value;event.target.value=''"/></li>
+		  <li class="item" onclick="event.stopPropagation()">Color <input type="text" name="colorInput" onclick="event.stopPropagation()" onchange="closeMenu();clickedElement.style.color = event.target.value;event.target.value='';"/></li>
 		  <li onclick="newNode(event)" class="item">Copy</li>
 		  <li class="item">Customize</li>
 		  <li onclick="deleteNode(event)" class="item">Delete</li>
