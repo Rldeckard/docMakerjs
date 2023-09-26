@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+	<head>
+		
+		<style>
+		body {
+		 background-color: #dfe8f1;
+		 text-align: center;
+		 position: absolute;
+		 width: 98%;
+		 height: 98%;
+		}
+
+		#context-menu {
+		 background-color: white;
+		 box-shadow: 2px 2px 5px gray;
+		 color: #1f194c;
+		 width: 10em;
+		 font-size: .9rem;
+		 position: fixed;
+		 visibility: hidden;
+		 text-align: left;
+		 list-style-type: none;
+		 padding: 0;
+		 outline: none;
+		}
+
+		.item {
+		 padding: 0.2em .8em;
+		}
+
+		.item:hover {
+		 background-color: rgba(44, 141, 247, 0.2);
+		 cursor: pointer;
+		}
+		.computer:hover {
+		 cursor: grab;
+		}
+		.computer:active {
+		 cursor: grabbing;
+		}
+		.item:active {
+		 cursor: default;
+		}
+		li > input {
+			width: 50%;
+		}
+		.playground {
+			width: 100%;
+			height: 100%;
+			cursor: move;
+		}
+		
+		</style>
+	</head>
+	<body>
+		
+		<!-- return false keeps the regular right click menu from popping up -->
+		<div class="playground" id="playground" oncontextmenu="bringMenu(event);return false;" style="margin-top:50px">
+			<i style="position:absolute" class="computer fa-solid fa-desktop fa-2xl"></i>
+			<i style="position:absolute" class="computer fa-solid fa-desktop fa-2xl"></i>
+			<i style="position:absolute" class="computer fa-solid fa-desktop fa-2xl"></i>
+			<i style="position:absolute" class="computer fa-solid fa-desktop fa-2xl"></i>
+		</div>
+		<!--tab index allows focusing on non input objects -->
+		<ul tabindex="0" onclick="closeMenu(event)" id="context-menu" onfocusout="closeMenu(event)">
+		  <li class="item">Add New</li>
+		  <li class="item" onclick="event.stopPropagation()">Color <input type="text" name="colorInput" onclick="event.stopPropagation()" onchange="clickedElement.style.color = event.target.value;event.target.value=''"/></li>
+		  <li onclick="newNode(event)" class="item">Copy</li>
+		  <li class="item">Customize</li>
+		  <li onclick="deleteNode(event)" class="item">Delete</li>
+		</ul>
+		<script src="https://kit.fontawesome.com/44af03c3b9.js" crossorigin="anonymous"></script>
+
+	</body>
+	
+	<script>
+		var clickedElement
+		contextMenu = document.getElementById('context-menu');
+		playground = document.getElementById('playground');
+		
+		playground.addEventListener('mousedown', dragMouseDown)
+		
+		function bringMenu(e) {
+			clickedElement = e.srcElement
+			playground.removeEventListener('mousedown', dragMouseDown)
+			contextMenu.style.left = e.clientX+5 + 'px';
+			contextMenu.style.top = e.clientY-15 + 'px';
+			contextMenu.style.visibility = 'visible';
+			contextMenu.focus();
+		}
+		
+		function closeMenu(e) {
+			if (!event.relatedTarget) {
+				contextMenu.style.visibility='hidden';
+			}
+			playground.addEventListener('mousedown', dragMouseDown)
+		}
+		
+		function dragMouseDown(e) {
+			e = e || window.event;
+			e.preventDefault();
+			
+			// get the mouse cursor position at startup:
+			pos3 = e.clientX;
+			pos4 = e.clientY;
+			document.onmouseup = closeDragElement;
+			// call a function whenever the cursor moves:
+			if (e.srcElement.id == "playground") {
+				document.onmousemove = pageDrag;
+			} else {
+				clickedElement = e.srcElement
+				document.onmousemove = elementDrag;
+			}
+		}
+		
+		function pageDrag(e) {
+			node = playground.children
+			pos1 = pos3 - e.clientX;
+			pos2 = pos4 - e.clientY;
+			pos3 = e.clientX;
+			pos4 = e.clientY;
+			for (i=0;i<node.length;i++) {
+				node.item(i).style.top = (node.item(i).offsetTop - pos2) + "px"
+				node.item(i).style.left = (node.item(i).offsetLeft - pos1) + "px"
+			}
+		}
+
+		function elementDrag(e) {
+			e = e || window.event;
+			e.preventDefault();
+			// calculate the new cursor position:
+			pos1 = pos3 - e.clientX;
+			pos2 = pos4 - e.clientY;
+			pos3 = e.clientX;
+			pos4 = e.clientY;
+			// set the element's new position:
+			clickedElement.style.top = (clickedElement.offsetTop - pos2) + "px";
+			clickedElement.style.left = (clickedElement.offsetLeft - pos1) + "px";
+		}
+
+		function closeDragElement() {
+			// stop moving when mouse button is released:
+			document.onmouseup = null;
+			document.onmousemove = null;
+		}
+		
+		function newNode(event) {
+			cloneDroid = clickedElement.cloneNode(true)
+			cloneDroid.style.left = '20px'
+			cloneDroid.style.top = '35px'
+			cloneDroid.style.transition = 'opacity .4s'
+			playground.prepend(cloneDroid)
+			cloneDroid.style.opacity = '.2'
+			setTimeout(() => cloneDroid.style.opacity = '1', 300)
+			setTimeout(() => cloneDroid.style.opacity = '.2', 600)
+			setTimeout(() => cloneDroid.style.opacity = '1', 1100)
+		}
+		
+		function deleteNode(event) {
+			clickedElement.remove()
+		}
+	</script>
+</html>
